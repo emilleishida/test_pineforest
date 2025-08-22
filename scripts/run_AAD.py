@@ -12,6 +12,7 @@ import matplotlib.pylab as plt
 from progressbar import progressbar
 from itertools import repeat
 from concurrent.futures import ProcessPoolExecutor
+import os
 
 
 # read data
@@ -48,11 +49,14 @@ class RecordCallback:
 
 # do it 200 times
 n_cores = 20
+n = 200
+metadata = data.values[:,-2:]
+nloops = 100
 
 def aad_run(data, metadata, seed):
     """Train, evaluate and save results from the model."""
     
-    model_temp_aad = AADForest(random_seed=seed)  
+    model_temp_aad = AADForest(random_seed=seed, n_jobs=1)  
     record_callback_temp_aad = RecordCallback()
 
     session_temp_aad = Session(
@@ -72,7 +76,7 @@ def aad_run(data, metadata, seed):
     session_temp_aad.run()
     labels_temp_aad = [list(session_temp_aad.known_labels.values())[i] == Label.ANOMALY 
                         for i in range(nloops)]
-    y_temp_aad = [sum(labels_temp_aad(:i]) for i in range(len(labels_temp_aad))]
+    y_temp_aad = [sum(labels_temp_aad[:i]) for i in range(len(labels_temp_aad))]
 
     return y_temp_aad
 
